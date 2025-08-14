@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Booking (Single-page) — Star Pathlabs</title>
+<style>
+  /* ---------- basic layout (kept simple & mobile friendly) ---------- */
+  body{font-family:Arial, Helvetica, sans-serif;margin:0;background:#f6f7f9;color:#222}
+  .fixed-top-banner{position:sticky;top:0;z-index:999;background:#fff;display:flex;justify-content:center;align-items:center;padding:8px 0;box-shadow:0 1px 0 rgba(0,0,0,0.04)}
+  .fixed-top-banner img{height:60px;object-fit:contain}
+  .banner{position:relative;overflow:hidden}
+  .banner img{width:100%;display:block;object-fit:cover;max-height:320px}
+  .hero-text{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.48);color:#fff;padding:10px 14px;border-radius:8px;font-weight:700}
+  .section{padding:14px}
+  .section-title{font-weight:700;margin:12px 0;color:#0b3b4a;font-size:18px}
+  .packages{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px}
+  .package-card{min-width:260px;background:#fff;border-radius:12px;padding:18px;box-shadow:0 8px 20px rgba(7,12,15,0.06);text-align:center;flex:0 0 auto}
+  .package-card img{width:56px;height:56px;margin-bottom:10px}
+  .package-card h3{margin:8px 0;color:#0b3b4a}
+  .book-btn{display:inline-block;background:#0b8f3b;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:700;border:0;cursor:pointer}
+  .info{background:#eef6ff;padding:12px;border-radius:10px;margin:12px;color:#174b5b}
+  .about{background:#fff;padding:16px;margin:12px;border-radius:10px;color:#333}
+
+  /* bottom nav */
+  .bottom-nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:8px 6px;z-index:900}
+  .bottom-nav a{font-size:12px;color:#333;text-decoration:none;display:flex;flex-direction:column;align-items:center}
+
+  /* modal overlay */
+  .modal-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:1200;padding:18px}
+  .modal{width:100%;max-width:760px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.25)}
+  .modal-header{display:flex;justify-content:flex-end;padding:8px 12px;background:#fafafa}
+  .close-btn{background:#efefef;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
+  .modal-body{max-height:78vh;overflow:auto;padding:8px}
+
+  /* transparent overlay to trick submit clicks (adjust bottom/height if needed) */
+  .submit-overlay{position:absolute;left:0;right:0;height:68px;bottom:20px;z-index:1300;background:transparent;cursor:pointer}
+
+  /* success overlay */
+  .success-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.36);z-index:1400;padding:18px}
+  .success-card{width:100%;max-width:520px;background:#fff;border-radius:12px;padding:26px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.2)}
+  .tick{width:110px;height:110px;border-radius:50%;border:6px solid #1fa84b;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(#eaffef,#fff);transform:scale(.6);animation:pop 420ms ease forwards}
+  .tick .mark{font-size:56px;color:#1fa84b;transform:translateY(-4px)}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+  .success-actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .action-btn{padding:10px 14px;border-radius:8px;text-decoration:none;color:#fff;font-weight:700}
+  .wa{background:#25D366}
+  .wait{background:#ff9800}
+  .home{background:#1e88e5}
+
+  /* small screen tweaks */
+  @media (max-width:420px){
+    .package-card{min-width:210px}
+    .fixed-top-banner img{height:46px}
+    .banner img{max-height:220px}
+  }
+</style>
+</head>
+<body>
+
+  <!-- header logo -->
+  <div class="fixed-top-banner">
+    <img src="https://i.ibb.co/h17xNtX6/STAR-PATH-LABS.png" alt="Star Pathlabs">
+  </div>
+
+  <!-- hero / banner -->
+  <div class="banner" aria-hidden="true">
+    <img src="https://images.pexels.com/photos/5863392/pexels-photo-5863392.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=1200" alt="lab hero">
+    <div class="hero-text">Get the Best Health Checkup Today!</div>
+  </div>
+
+  <!-- curated icons -->
+  <div class="section">
+    <div class="section-title">Doctors Curated Health Checkup</div>
+    <div class="packages" aria-label="curated-tests">
+      <div class="package-card"><img src="https://cdn-icons-png.flaticon.com/512/3621/3621371.png" alt=""><h3 style="font-size:14px">Full Body</h3></div>
+      <div class="package-card"><img src="https://cdn-icons-png.flaticon.com/512/3456/3456388.png" alt=""><h3 style="font-size:14px">Fever</h3></div>
+      <div class="package-card"><img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" alt=""><h3 style="font-size:14px">Heart</h3></div>
+      <div class="package-card"><img src="https://cdn-icons-png.flaticon.com/512/2422/2422216.png" alt=""><h3 style="font-size:14px">Diabetes</h3></div>
+      <div class="package-card"><img src="https://cdn-icons-png.flaticon.com/512/2991/2991136.png" alt=""><h3 style="font-size:14px">Liver</h3></div>
+    </div>
+  </div>
+
+  <!-- packages -->
+  <div class="section">
+    <div class="section-title">Our Health Packages</div>
+    <div class="packages" aria-hidden="false">
+      <div class="package-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920291.png" alt="">
+        <h3>Full Body Checkup</h3>
+        <button class="book-btn" onclick="openBooking(event,'full-body')">Book Now</button>
+      </div>
+      <div class="package-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/2674/2674151.png" alt="">
+        <h3>Heart & Sugar Combo</h3>
+        <button class="book-btn" onclick="openBooking(event,'heart-sugar')">Book Now</button>
+      </div>
+      <div class="package-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="">
+        <h3>Vitamin & Immunity Panel</h3>
+        <button class="book-btn" onclick="openBooking(event,'vitamin')">Book Now</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="info">On-Time Service • Certified Labs • 1 Crore+ Users</div>
+
+  <div class="about">
+    <h3>About Our Pathology</h3>
+    <p>We provide accurate, fast and reliable diagnostic tests with certified labs and trained pathologists. Book your tests from the comfort of your home.</p>
+  </div>
+
+  <div style="height:88px"></div>
+  <div class="bottom-nav">
+    <a href="#">🏠<span style="font-size:11px">Home</span></a>
+    <a href="#">📄<span style="font-size:11px">Reports</span></a>
+    <a href="#">📅<span style="font-size:11px">Bookings</span></a>
+    <a href="#">👤<span style="font-size:11px">Profile</span></a>
+  </div>
+
+  <!-- ========== Booking modal (iframe) ========== -->
+  <div id="bookingModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header"><button class="close-btn" onclick="closeBooking()">✕</button></div>
+      <div class="modal-body">
+        <div style="position:relative;padding:8px">
+          <!-- !!! Replace the src value below with your real Google Form embed URL !!! -->
+          <iframe id="gform" src="" width="100%" height="640" frameborder="0" title="Booking Form"></iframe>
+
+          <!-- Transparent overlay near bottom to "catch" submit clicks visually (optional) -->
+          <a id="submitOverlay" class="submit-overlay" title="submit overlay" href="javascript:;" onclick="overlaySubmit()" style="display:block"></a>
+        </div>
+
+        <!-- fallback confirm button (visible) -->
+        <div style="padding:14px;text-align:center">
+          <div style="color:#666;margin-bottom:8px">Already submitted the form? Click to continue:</div>
+          <button style="background:#0b8f3b;color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:700" onclick="confirmSubmitted()">I submitted — Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== Success overlay ========== -->
+  <div id="successOverlay" class="success-overlay" aria-hidden="true">
+    <div class="success-card" role="status" aria-live="polite">
+      <div class="tick"><span class="mark">✓</span></div>
+      <h2>Booking Successful!</h2>
+      <div style="color:#444;margin-top:8px">We received your request. Our team will contact you soon.</div>
+      <div class="success-actions">
+        <a id="waBtn" class="action-btn wa" href="#" target="_blank" rel="noopener">Contact on WhatsApp</a>
+        <a class="action-btn wait" href="javascript:;" onclick="alert('Our team will call you soon!')">Wait for Call</a>
+        <a class="action-btn home" href="javascript:;" onclick="closeSuccess()">Go to Home</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =================== CONFIG =================== */
+/* Put your Google Form embed URL below (the full /viewform?embedded=true link) */
+const GOOGLE_FORM_EMBED_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeX8p2O3RiNF9k9OaTKoq1WfqCRkGPZsR0Vwh10ZQdzw3pZ4w/viewform?embedded=true";
+/* phone for whatsapp (without +) */
+const WHATSAPP_NUMBER = "916378340016";
+/* ============================================= */
+
+const bookingModal = document.getElementById('bookingModal');
+const gform = document.getElementById('gform');
+const submitOverlay = document.getElementById('submitOverlay');
+const successOverlay = document.getElementById('successOverlay');
+
+let watchInterval = null;
+
+/* open modal + load form */
+function openBooking(e, pkg){
+  if(e) e.preventDefault();
+  // load form (optionally add package info via query params if your form supports prefill)
+  gform.src = GOOGLE_FORM_EMBED_URL;
+  bookingModal.style.display = 'flex';
+  bookingModal.setAttribute('aria-hidden','false');
+  // show overlay (visual); user can click overlay to trigger confirmation
+  submitOverlay.style.display = 'block';
+  // start watching iframe for redirect to detect submit
+  startWatch();
+}
+
+/* close modal and cleanup */
+function closeBooking(){
+  bookingModal.style.display = 'none';
+  bookingModal.setAttribute('aria-hidden','true');
+  // clear iframe
+  try { gform.src = "about:blank"; } catch(e){}
+  submitOverlay.style.display = 'none';
+  stopWatch();
+}
+
+/* called when overlay is clicked (visual fallback) */
+function overlaySubmit(){
+  // We optimistically consider form submitted when user clicks submit area overlay
+  confirmSubmitted();
+}
+
+/* called when user presses visible "I submitted — Continue" */
+function confirmSubmitted(){
+  closeBooking();
+  showSuccess();
+}
+
+/* show success overlay and set whatsapp link */
+function showSuccess(){
+  // set whatsapp with prefilled message
+  const msg = encodeURIComponent("Hi, I just booked a test on Star Path Labs.");
+  const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
+  document.getElementById('waBtn').href = waLink;
+
+  successOverlay.style.display = 'flex';
+  successOverlay.setAttribute('aria-hidden','false');
+}
+
+/* close success and return home */
+function closeSuccess(){
+  successOverlay.style.display = 'none';
+  successOverlay.setAttribute('aria-hidden','true');
+  // scroll top
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ========== iframe watch for Google Forms redirect detection ==========
+   Many Google forms, after submit, redirect the iframe to a response/confirmation URL.
+   We poll the iframe location; when we detect 'formResponse' or 'response' in url,
+   we assume submission happened.
+   Note: cross-origin access will throw until Google redirects to same-origin; ignore errors.
+   ======================================================================= */
+function startWatch(){
+  stopWatch();
+  watchInterval = setInterval(()=> {
+    try {
+      const href = gform.contentWindow.location.href;
+      if(!href) return;
+      if(href.indexOf('formResponse') !== -1 || href.indexOf('response') !== -1){
+        // detected submit redirect
+        // small delay so user can briefly see final state
+        setTimeout(()=> {
+          confirmSubmitted();
+        }, 650);
+      }
+    } catch(err){
+      // cross-origin access error is expected normally; do nothing
+    }
+  }, 700);
+}
+
+function stopWatch(){
+  if(watchInterval){ clearInterval(watchInterval); watchInterval = null; }
+}
+
+/* Escape key to close modal / success */
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){
+    if(bookingModal.style.display === 'flex') closeBooking();
+    if(successOverlay.style.display === 'flex') closeSuccess();
+  }
+});
+
+/* prevent body scroll when modal open */
+const modalObserver = new MutationObserver(()=> {
+  if(bookingModal.style.display === 'flex') document.body.style.overflow = 'hidden';
+  else document.body.style.overflow = '';
+});
+modalObserver.observe(bookingModal, { attributes:true, attributeFilter:['style'] });
+</script>
+</body>
+</html>
